@@ -1,0 +1,40 @@
+%% FitQuest System Architecture (Mermaid)
+flowchart LR
+  %% Client Layer
+  subgraph C["Client - React (Vite/TS/Tailwind/shadcn-ui)"]
+    U["Child & Parent Users"]
+    FE["React App"]
+    U --> FE
+  end
+
+  %% Supabase Platform
+  subgraph S["Supabase"]
+    AUTH["Auth"]
+    DB["Postgres - RLS\nprofiles, children, challenge_completions"]
+    ST["Storage - Photos"]
+    FUNC["Edge Function: generate-challenges (Deno)"]
+  end
+
+  %% External Services
+  subgraph X["External Services"]
+    W["WeatherAPI.com"]
+    LLM["Groq LLM API (OpenAI-compatible)"]
+  end
+
+  %% Auth flow
+  FE -- sign-in/signup --> AUTH
+  AUTH -- JWT session --> FE
+
+  %% App data flows
+  FE -- read/write --> DB
+  FE -- upload/download --> ST
+
+  %% AI challenge generation
+  FE -- request challenges --> FUNC
+  FUNC -- fetch current weather --> W
+  FUNC -- prompt & parse JSON --> LLM
+  FUNC -- {challenges, weather} --> FE
+
+  %% Internal links
+  AUTH --- DB
+  DB --- ST

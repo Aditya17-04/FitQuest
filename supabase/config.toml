@@ -1,0 +1,4 @@
+project_id = "dgrnixgrnckdshfswraz"
+
+[functions.generate-challenges]
+verify_jwt = false
